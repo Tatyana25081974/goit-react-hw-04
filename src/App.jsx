@@ -49,7 +49,7 @@ const App = () => {
         }
 
         setImages((prev) => [...prev, ...data.results]);
-        setTotalPages(Math.ceil(data.total / 12)); 
+        setTotalPages(Math.ceil(data.total / 20)); 
       } catch (error) {
         setError("Помилка завантаження зображень.");
       } finally {

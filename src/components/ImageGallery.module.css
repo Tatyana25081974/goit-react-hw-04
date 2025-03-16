@@ -1,7 +1,7 @@
 .gallery {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    /* 4 колонки в ряд */
+    grid-template-columns: repeat(10, 1fr);
+   
     gap: 15px;
     /* Відступ між картками */
     justify-content: center;
