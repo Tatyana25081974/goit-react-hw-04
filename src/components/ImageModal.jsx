@@ -1,38 +1,31 @@
 import Modal from "react-modal";
-
-// Встановлюємо головний елемент для доступності (потрібно для React Modal)
-Modal.setAppElement("#root");
+import styles from "./ImageModal.module.css";
 
 const ImageModal = ({ image, isOpen, onClose }) => {
-  if (!image) return null; // Якщо фото немає, не рендеримо вікно
+  console.log("Rendering ImageModal", { image, isOpen });
+  if (!image || !isOpen) return null; 
 
   return (
-    <Modal 
-      isOpen={isOpen} 
-      onRequestClose={onClose} 
+    <Modal
+      isOpen={isOpen}
+      onRequestClose={onClose}
       contentLabel="Image Modal"
-      style={{
-        overlay: { backgroundColor: "rgba(0, 0, 0, 0.8)" },
-        content: {
-          top: "50%",
-          left: "50%",
-          right: "auto",
-          bottom: "auto",
-          marginRight: "-50%",
-          transform: "translate(-50%, -50%)",
-          background: "white",
-          padding: "20px",
-          borderRadius: "8px",
-          textAlign: "center"
-        }
-      }}
+      className={styles.modal}
+      overlayClassName={styles.overlay}
+     
     >
-      <div>
-        <img src={image.urls.regular} alt={image.alt_description} style={{ maxWidth: "100%", maxHeight: "80vh" }} />
-        <p>Автор: {image.user.name}</p>
-        <p>Лайки: {image.likes}</p>
-        <button onClick={onClose}>Закрити</button>
-      </div>
+      {image?.urls && ( // Запобігає помилці, якщо `image` ще не завантажено
+        <>
+          <img
+            src={image.urls.regular}
+            alt={image.alt_description || "Image"}
+            className={styles.image}
+          />
+          <p>Автор: {image.user?.name || "Невідомий"}</p>
+          <p>Лайки: {image.likes || 0}</p>
+          <button onClick={onClose} className={styles.closeButton}>Закрити</button>
+        </>
+      )}
     </Modal>
   );
 };

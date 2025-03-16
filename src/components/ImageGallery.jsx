@@ -1,17 +1,22 @@
+import styles from "./ImageGallery.module.css";
 import ImageCard from "./ImageCard";
 
 const ImageGallery = ({ images, onImageClick }) => {
-    if (images.lenght === 0) return null;
+  if (images.length === 0) return null;
 
-    return (
-        <ul>
-            {images.map((image) => (
-                <li key={image.id}>
-                    <ImageCard image={image} onImageClick={onImageClick} />
-                </li>
-            ))}
-        </ul>
-    );
+  return (
+    <ul className={styles.gallery}>
+      {images.slice(0, 12).map((image) => ( // Беремо тільки 12 фото
+        <li 
+          key={image.id} 
+          onClick={() => onImageClick(image)} 
+          className={styles.listItem} 
+        >
+          <ImageCard image={image} />
+        </li>
+      ))}
+    </ul>
+  );
 };
 
 export default ImageGallery;

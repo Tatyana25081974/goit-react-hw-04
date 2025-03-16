@@ -1,0 +1,14 @@
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    /* 4 колонки в ряд */
+    gap: 15px;
+    /* Відступ між картками */
+    justify-content: center;
+    padding: 20px;
+}
+
+.listItem {
+    list-style: none;
+    /* Видаляємо маркери списку */
+}
