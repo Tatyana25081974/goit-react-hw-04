@@ -6,7 +6,7 @@ const ImageGallery = ({ images, onImageClick }) => {
 
   return (
     <ul className={styles.gallery}>
-      {images.slice(0, 12).map((image) => ( // Беремо тільки 12 фото
+      {images.map((image) => (
         <li 
           key={image.id} 
           onClick={() => onImageClick(image)} 

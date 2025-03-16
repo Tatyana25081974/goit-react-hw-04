@@ -6,19 +6,29 @@ import ErrorMessage from "./components/ErrorMessage";
 import LoadMoreBtn from "./components/LoadMoreBtn";
 import ImageModal from "./components/ImageModal";
 import { fetchImages } from "./api/api";
+import toast, { Toaster } from "react-hot-toast";
 
 const App = () => {
-  const [query, setQuery] = useState(""); // Пошуковий запит
-  const [images, setImages] = useState([]); // Масив зображень
-  const [page, setPage] = useState(1); // Номер сторінки
-  const [loading, setLoading] = useState(false); // Чи йде завантаження
-  const [error, setError] = useState(null); // Помилка
-  const [selectedImage, setSelectedImage] = useState(null); // Вибране зображення для модального вікна
+  const [query, setQuery] = useState(""); 
+  const [images, setImages] = useState([]); 
+  const [page, setPage] = useState(1); 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null); 
+  const [totalPages, setTotalPages] = useState(1);
 
   const handleSearch = (searchQuery) => {
-    setQuery(searchQuery);
-    setImages([]); // Очищаємо попередні зображення
+    const trimmedQuery = searchQuery.trim(); 
+
+    if (trimmedQuery === query) {
+      toast("Цей запит уже виконано!");
+      return;
+    }
+
+    setQuery(trimmedQuery);
+    setImages([]); 
     setPage(1);
+    setError(null);
   };
 
   useEffect(() => {
@@ -30,47 +40,47 @@ const App = () => {
 
       try {
         const data = await fetchImages(query, page);
-        console.log("Отримані дані:", data); 
 
-        if (!data || !data.results || data.results.length === 0) {
+        if (!data.results.length) {
           setError("Зображень не знайдено!");
-           return;
-    }
-       setImages((prev) => [...prev, ...data.results]); 
-    } catch (error) {
-      console.error("Помилка завантаження:", error);
-      setError("Помилка завантаження зображень.");
-    } finally {
-      setLoading(false);
-    }
-  };
+          setImages([]); 
+          setTotalPages(1); 
+          return;
+        }
 
-  getImages();
-}, [query, page]);
+        setImages((prev) => [...prev, ...data.results]);
+        setTotalPages(Math.ceil(data.total / 12)); 
+      } catch (error) {
+        setError("Помилка завантаження зображень.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getImages();
+  }, [query, page]);
 
   return (
     <div>
+      <Toaster />
       <SearchBar onSubmit={handleSearch} />
-
+      
       {error && <ErrorMessage message={error} />}
 
       <ImageGallery images={images} onImageClick={setSelectedImage} />
 
       {loading && <Loader />}
 
-      {images.length > 0 && !loading && (
+      {images.length > 0 && !loading && page < totalPages && (
         <LoadMoreBtn onClick={() => setPage((prev) => prev + 1)} />
       )}
 
-      {selectedImage && (
-        <ImageModal 
-          key={selectedImage.id} // Унікальний ключ
-          image={selectedImage} 
-          isOpen={Boolean(selectedImage)} 
-          onClose={() => setSelectedImage(null)} 
-        />
-      )}
-    </div> 
+      <ImageModal 
+        image={selectedImage} 
+        isOpen={Boolean(selectedImage)} 
+        onClose={() => setSelectedImage(null)} 
+      />
+    </div>
   );
 };
 
