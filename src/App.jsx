@@ -1,35 +1,64 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from "react";
+import SearchBar from "./components/SearchBar";
+import ImageGallery from "./components/ImageGallery";
+import ImageModal from "./components/ImageModal";
+import { fetchImages } from "./api/api"; // Імпортуємо API-запит
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+
+  const [query, setQuery] = useState(""); // Пошуковий запит
+const [images, setImages] = useState([]); // Масив зображень
+const [page, setPage] = useState(1); // Номер сторінки для пагінації
+const [loading, setLoading] = useState(false); // Стан завантаження
+  const [error, setError] = useState(null); // Помилка при запиті
+  const [selectedImage, setSelectedImage] = useState(null); // Обране зображення для модального вікна
+
+  
+  const handleSearch = (searchQuery) => {
+    setQuery(searchQuery);
+    setImages([]); // Очищаємо попередні зображення при новому запиті
+    setPage(1);
+  };
+
+  useEffect(() => {
+  if (!query) return; // Якщо немає запиту, виходимо з useEffect
+
+  const getImages = async () => {
+    setLoading(true); // Починається завантаження
+    setError(null); // Очищаємо можливі попередні помилки
+
+    try {
+      const data = await fetchImages(query, page); // Викликаємо API-запит
+      setImages((prev) => [...prev, ...data.results]); // Додаємо нові фото до масиву
+    } catch (error) {
+      setError("Помилка завантаження зображень.");
+    } finally {
+      setLoading(false); // Завантаження закінчилося
+    }
+  };
+
+  getImages(); // Викликаємо функцію для отримання фото
+}, [query, page]); // Виконується при зміні query або page
+   
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div>
+      <SearchBar onSubmit={handleSearch} />
+      {error && <p style={{ color: "red" }}>{error}</p>}
 
-export default App
+      <ImageGallery images={images} onImageClick={setSelectedImage} /> {/* Використовуємо ImageGallery */}
+
+      {loading && <p>Завантаження...</p>}
+
+      {images.length > 0 && !loading && (
+        <button onClick={() => setPage((prev) => prev + 1)}>Load more</button>
+      )}
+
+      {/* Модальне вікно для перегляду фото у великому форматі */}
+      <ImageModal image={selectedImage} isOpen={!!selectedImage} onClose={() => setSelectedImage(null)} />
+    </div>
+      
+  );
+};
+
+export default App;
