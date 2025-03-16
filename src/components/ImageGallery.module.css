@@ -1,14 +1,25 @@
+/* 🖼 Галерея */
 .gallery {
     display: grid;
     grid-template-columns: repeat(10, 1fr);
-   
+    /* 10 карток у ряд */
     gap: 15px;
     /* Відступ між картками */
     justify-content: center;
     padding: 20px;
+    background-color: #121212;
+    /* Темний фон */
+    border-radius: 10px;
 }
 
+/* 📌 Елемент списку */
 .listItem {
     list-style: none;
     /* Видаляємо маркери списку */
+    transition: transform 0.3s ease-in-out;
+}
+
+/* ✨ Анімація при наведенні */
+.listItem:hover {
+    transform: scale(1.05);
 }
